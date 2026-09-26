@@ -21,16 +21,15 @@ import common  # noqa: E402
 import stats  # noqa: E402
 
 GRID = {
-    "setups": [{"pullback": True, "breakout": False},
-               {"pullback": False, "breakout": True},
+    "setups": [{"pullback": False, "breakout": True},
                {"pullback": True, "breakout": True}],
     "atr_stop": [1.0, 1.5, 2.0],
-    "atr_target": [1.5, 2.5, 3.5],
-    "rsi_pullback": [35, 42, 50],
-    "trail_atr": [0.0, 2.0],
-    "min_atr_pct": [0.1, 0.2],
+    "atr_target": [5.0, 8.0, 10.0],
+    "min_atr_pct": [0.3, 0.4, 0.5],
+    "donchian_len": [20, 30],
+    "volume_mult": [1.2, 1.5, 2.0],
 }
-MIN_TRAIN_TRADES = 15
+MIN_TRAIN_TRADES = 12
 MIN_TEST_TRADES = 6
 
 
@@ -54,8 +53,8 @@ def evaluate(candles, split, params, cfg, signals):
 
 def label(p):
     setups = "+".join(k for k, v in p["setups"].items() if v) or "none"
-    return (f"{setups} stop={p['atr_stop']} tgt={p['atr_target']} rsi={p['rsi_pullback']} "
-            f"trail={p['trail_atr']} minatr={p['min_atr_pct']}")
+    return (f"{setups} stop={p['atr_stop']} tgt={p['atr_target']} minatr={p['min_atr_pct']} "
+            f"donch={p['donchian_len']} vol={p['volume_mult']}")
 
 
 def main():
@@ -82,8 +81,6 @@ def main():
         p.update(dict(zip(keys, combo)))
         if p["atr_target"] <= p["atr_stop"] * 0.75:
             continue
-        if not p["setups"]["pullback"] and p["rsi_pullback"] != GRID["rsi_pullback"][0]:
-            continue  # rsi only matters to the pullback setup
         tr, te = evaluate(candles, split, p, cfg, signals)
         results.append({"params": {k: p[k] for k in keys}, "train": tr, "test": te,
                         "score": score(tr)})
