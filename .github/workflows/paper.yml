@@ -1,0 +1,39 @@
+name: Demo trader
+
+# The live paper (demo) account: one tick every 15 minutes on KuCoin market
+# data, journal committed back so the history is the record.
+on:
+  schedule:
+    - cron: "2,17,32,47 * * * *"   # just after each 15m candle closes
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: journal-writer
+  cancel-in-progress: false
+
+jobs:
+  tick:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Tick
+        run: python3 core/paper.py tick
+      - name: Commit journal
+        run: |
+          git config user.name "demo-trader[bot]"
+          git config user.email "demo-trader@users.noreply.github.com"
+          git add journal/
+          git diff --cached --quiet && exit 0
+          git commit -q -m "tick: $(tail -1 journal/cycles.log | cut -c1-120)"
+          for i in 1 2 3 4; do
+            git push origin "HEAD:${GITHUB_REF_NAME}" && exit 0
+            sleep $((i * 3)); git pull --rebase -q origin "${GITHUB_REF_NAME}"
+          done
+          exit 1

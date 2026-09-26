@@ -1,0 +1,147 @@
+"""Demo account tick: one pass of the live paper trader on KuCoin market data.
+
+    python3 core/paper.py tick      # run once (GitHub Actions calls this every 15 min)
+    python3 core/paper.py status    # print the account summary
+    python3 core/paper.py reset     # wipe the demo account (asks no questions)
+
+Each tick:
+1. Manages the open position through every CLOSED 1-minute candle since the
+   last tick (the stop and target behave like resting exchange orders).
+2. Evaluates the entry signal on the latest CLOSED strategy candle, once per
+   candle. A signal found more than one candle late (a delayed runner) is
+   logged as stale and skipped, never back-filled.
+3. Enters at the live best ask plus slippage and fee.
+Every signal, fill and skip is journaled, with the data source that answered.
+"""
+import os
+import sys
+import time
+
+sys.path.insert(0, os.path.dirname(__file__))
+import common  # noqa: E402
+import engine  # noqa: E402
+import market  # noqa: E402
+import stats  # noqa: E402
+
+SIGNALS = os.path.join(common.JOURNAL, "signals.jsonl")
+STATUS = os.path.join(common.JOURNAL, "STATUS.md")
+
+
+def iso(ts):
+    return time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime(ts))
+
+
+def tick(now=None):
+    now = int(now or time.time())
+    cfg = common.load_json(common.CONFIG)
+    params = common.load_json(common.PARAMS)
+    state = common.load_json(common.STATE, {})
+    signals = common.load_signals()
+    sym, tf = cfg["symbol"], cfg["timeframe"]
+    step = market.TF_SEC[tf]
+    acct = engine.Account(cfg, params, state.get("account"))
+    events, sig_rows, notes = [], [], []
+
+    # 1. Manage the open position on 1m candles.
+    if acct.pos:
+        since = state.get("managed_until", acct.pos["entry_ts"])
+        m1, src1 = market.candles(sym, "1m", since, now)
+        for b in market.closed_only(m1, "1m", now):
+            if b["t"] < since:
+                continue
+            ev = acct.on_bar(b, 60)
+            state["managed_until"] = b["t"] + 60
+            if ev:
+                ev.update({"mode": "paper", "source": src1})
+                events.append(ev)
+                notes.append(f"exit {ev['reason']} pnl {ev['pnl']:+.2f}")
+                break
+
+    # 2. Signal on the latest closed strategy candle.
+    lookback = (signals.warmup(acct.p) + 20) * step
+    rows, src = market.candles(sym, tf, now - lookback, now)
+    closed = market.closed_only(rows, tf, now)
+    if not closed:
+        raise RuntimeError("no closed candles returned")
+    last = closed[-1]
+    mark = last["c"]
+    if state.get("last_signal_bar") != last["t"]:
+        state["last_signal_bar"] = last["t"]
+        x = signals.prepare(closed, acct.p)
+        sig = signals.signal(x, len(closed) - 1, acct.p)
+        if sig:
+            row = {"ts": now, "bar": last["t"], "setup": sig["setup"], "close": last["c"],
+                   "atr": round(sig["atr"], 4), "source": src}
+            late = now - (last["t"] + step)
+            ok, why = acct.can_enter(now, mark)
+            if late > step:
+                ok, why = False, f"stale_by_{late}s"
+            if ok:
+                tk, tsrc = market.ticker(sym)
+                ev = acct.enter(now, tk["ask"], sig)
+                if ev:
+                    ev.update({"mode": "paper", "source": tsrc, "bid": tk["bid"], "ask": tk["ask"],
+                               "signal_bar": last["t"]})
+                    events.append(ev)
+                    state["managed_until"] = (now // 60 + 1) * 60
+                    mark = tk["last"]
+                    notes.append(f"entry {sig['setup']} @ {ev['price']}")
+                    row["action"] = "entered"
+                else:
+                    row["action"] = "skipped:size_below_min"
+            else:
+                row["action"] = "skipped:" + why
+                notes.append(f"signal {sig['setup']} skipped ({why})")
+            sig_rows.append(row)
+
+    common.append_jsonl(common.LEDGER, events)
+    common.append_jsonl(SIGNALS, sig_rows)
+    state["account"] = acct.state()
+    state["last_tick"] = iso(now)
+    state["last_price"] = mark
+    common.save_json(common.STATE, state)
+    eq = acct.equity(mark)
+    pos = f"LONG {acct.pos['qty']:.4f} @ {acct.pos['entry']:.3f} stop {acct.pos['stop']:.3f} " \
+          f"tgt {acct.pos['target']:.3f}" if acct.pos else "flat"
+    line = f"{iso(now)} tick src={src} px={mark:.3f} equity={eq:.2f} {pos}" + \
+           (" | " + "; ".join(notes) if notes else "")
+    with open(common.CYCLES, "a") as f:
+        f.write(line + "\n")
+    write_status(cfg, state, eq, mark)
+    print(line)
+
+
+def write_status(cfg, state, eq, mark):
+    exits = [e for e in common.read_jsonl(common.LEDGER) if e["type"] == "exit"]
+    s = stats.summarize(exits, cfg["starting_balance_usdt"])
+    start = cfg["starting_balance_usdt"]
+    acct = state["account"]
+    lines = [
+        "# Demo account status (auto-generated by core/paper.py)", "",
+        f"- last tick: {state['last_tick']}",
+        f"- {cfg['symbol']} last: {mark:.3f}",
+        f"- equity: {eq:.2f} USDT (start {start:.2f}, {((eq / start) - 1) * 100:+.2f}%)",
+        f"- open position: {acct['pos']['setup'] + ' long @ ' + format(acct['pos']['entry'], '.3f') if acct['pos'] else 'none'}",
+        "", stats.render(s, "Closed trades"),
+    ]
+    with open(STATUS, "w") as f:
+        f.write("\n".join(lines) + "\n")
+
+
+def main():
+    cmd = sys.argv[1] if len(sys.argv) > 1 else "tick"
+    if cmd == "tick":
+        tick()
+    elif cmd == "status":
+        print(open(STATUS).read() if os.path.exists(STATUS) else "no ticks yet")
+    elif cmd == "reset":
+        for p in (common.STATE, common.LEDGER, SIGNALS, STATUS):
+            if os.path.exists(p):
+                os.remove(p)
+        print("demo account reset")
+    else:
+        sys.exit(f"unknown command {cmd}")
+
+
+if __name__ == "__main__":
+    main()

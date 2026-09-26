@@ -1,0 +1,17 @@
+{
+  "_comment": "PROTECTED. Operator-owned hard limits. The improvement loop (IMPROVE.md) may tune strategy/params.json but never this file; core/validate.py and CI enforce it.",
+  "mode": "paper",
+  "exchange": "kucoin",
+  "symbol": "SOL-USDT",
+  "timeframe": "15m",
+  "starting_balance_usdt": 1000.0,
+  "taker_fee": 0.001,
+  "slippage_bps": 3.0,
+  "allow_short": false,
+  "ceilings": {
+    "risk_per_trade_pct": 2.0,
+    "position_pct": 100.0,
+    "daily_loss_pct": 5.0,
+    "trades_per_day": 12
+  }
+}

@@ -1,0 +1,43 @@
+name: Daily research
+
+# Walk-forward backtest over the last 60 days of KuCoin 15m candles. Proposes
+# parameter changes in reports/; never applies them (see IMPROVE.md).
+on:
+  schedule:
+    - cron: "11 5 * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: journal-writer
+  cancel-in-progress: false
+
+jobs:
+  research:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Backtest current params (60d)
+        run: |
+          mkdir -p reports data
+          python3 core/backtest.py --days 60 --save data/sol-15m.json | tee reports/backtest-latest.md
+      - name: Walk-forward optimise
+        run: python3 core/optimize.py --file data/sol-15m.json
+      - name: Commit reports
+        run: |
+          git config user.name "demo-trader[bot]"
+          git config user.email "demo-trader@users.noreply.github.com"
+          git add reports/
+          git diff --cached --quiet && exit 0
+          git commit -q -m "research: $(date -u +%F) walk-forward report"
+          for i in 1 2 3 4; do
+            git push origin "HEAD:${GITHUB_REF_NAME}" && exit 0
+            sleep $((i * 3)); git pull --rebase -q origin "${GITHUB_REF_NAME}"
+          done
+          exit 1
