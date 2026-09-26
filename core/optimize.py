@@ -82,6 +82,8 @@ def main():
         p.update(dict(zip(keys, combo)))
         if p["atr_target"] <= p["atr_stop"] * 0.75:
             continue
+        if not p["setups"]["pullback"] and p["rsi_pullback"] != GRID["rsi_pullback"][0]:
+            continue  # rsi only matters to the pullback setup
         tr, te = evaluate(candles, split, p, cfg, signals)
         results.append({"params": {k: p[k] for k in keys}, "train": tr, "test": te,
                         "score": score(tr)})

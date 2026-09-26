@@ -26,14 +26,14 @@ jobs:
       - name: Backtest current params (60d)
         run: |
           mkdir -p reports data
-          python3 core/backtest.py --days 60 --save data/sol-15m.json | tee reports/backtest-latest.md
+          python3 core/backtest.py --days 90 --save data/sol-15m.json | tee reports/backtest-latest.md
       - name: Walk-forward optimise
         run: python3 core/optimize.py --file data/sol-15m.json
       - name: Commit reports
         run: |
           git config user.name "demo-trader[bot]"
           git config user.email "demo-trader@users.noreply.github.com"
-          git add reports/
+          git add reports/ data/sol-15m.json
           git diff --cached --quiet && exit 0
           git commit -q -m "research: $(date -u +%F) walk-forward report"
           for i in 1 2 3 4; do

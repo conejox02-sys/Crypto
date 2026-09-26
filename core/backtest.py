@@ -73,7 +73,9 @@ def main():
     else:
         candles, src = fetch(cfg, a.days)
         if a.save:
-            common.save_json(a.save, candles)
+            os.makedirs(os.path.dirname(os.path.abspath(a.save)), exist_ok=True)
+            with open(a.save, "w") as f:  # compact: one candle per line
+                f.write("[\n" + ",\n".join(json.dumps(c, separators=(",", ":")) for c in candles) + "\n]\n")
     events, acct, curve = run(candles, params, cfg, common.load_signals())
     s = stats.summarize([e for e in events if e["type"] == "exit"],
                         cfg["starting_balance_usdt"], curve)
