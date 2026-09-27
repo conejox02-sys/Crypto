@@ -1,4 +1,5 @@
 """Shared paths and loaders."""
+import gzip
 import importlib.util
 import json
 import os
@@ -17,7 +18,8 @@ CACHE = os.path.join(ROOT, "data")
 def load_json(path, default=None):
     if not os.path.exists(path):
         return default
-    with open(path) as f:
+    opener = gzip.open if path.endswith(".gz") else open
+    with opener(path, "rt") as f:
         return json.load(f)
 
 

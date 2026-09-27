@@ -6,6 +6,7 @@
 Signals fire on a closed bar; entries fill at the NEXT bar's open (+slippage).
 """
 import argparse
+import gzip
 import json
 import os
 import sys
@@ -65,17 +66,23 @@ def main():
     ap.add_argument("--save", help="save fetched candles to this JSON file")
     ap.add_argument("--params", default=common.PARAMS)
     ap.add_argument("--json", action="store_true")
+    ap.add_argument("--tf", help="candle timeframe to fetch (default: config timeframe)")
+    ap.add_argument("--fetch-only", action="store_true", help="save candles, skip the backtest")
     a = ap.parse_args()
     cfg = common.load_json(common.CONFIG)
     params = common.load_json(a.params)
     if a.file:
         candles, src = common.load_json(a.file), "file:" + a.file
     else:
-        candles, src = fetch(cfg, a.days)
+        candles, src = fetch(cfg, a.days, a.tf)
         if a.save:
             os.makedirs(os.path.dirname(os.path.abspath(a.save)), exist_ok=True)
-            with open(a.save, "w") as f:  # compact: one candle per line
+            opener = gzip.open if a.save.endswith(".gz") else open
+            with opener(a.save, "wt") as f:  # compact: one candle per line
                 f.write("[\n" + ",\n".join(json.dumps(c, separators=(",", ":")) for c in candles) + "\n]\n")
+        if a.fetch_only:
+            print(f"saved {len(candles)} x {a.tf or cfg['timeframe']} candles from {src} to {a.save}")
+            return
     events, acct, curve = run(candles, params, cfg, common.load_signals())
     s = stats.summarize([e for e in events if e["type"] == "exit"],
                         cfg["starting_balance_usdt"], curve)

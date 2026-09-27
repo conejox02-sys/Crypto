@@ -7,6 +7,9 @@ on:
       days:
         description: "Days of history to download"
         default: "365"
+      timeframe:
+        description: "Candle timeframe (1m, 5m, 15m, 1h)"
+        default: "15m"
 
 permissions:
   contents: write
@@ -18,24 +21,30 @@ concurrency:
 jobs:
   fetch:
     runs-on: ubuntu-latest
-    timeout-minutes: 20
+    timeout-minutes: 40
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
         with:
           python-version: "3.12"
-      - name: Download and backtest
+      - name: Download (and backtest when 15m)
+        env:
+          DAYS: ${{ inputs.days }}
+          TF: ${{ inputs.timeframe }}
         run: |
           mkdir -p reports data
-          python3 core/backtest.py --days "${{ inputs.days }}" --save "data/sol-15m-${{ inputs.days }}d.json" \
-            | tee "reports/backtest-${{ inputs.days }}d.md"
+          if [ "$TF" = "15m" ]; then
+            python3 core/backtest.py --days "$DAYS" --save "data/sol-15m-${DAYS}d.json" | tee "reports/backtest-${DAYS}d.md"
+          else
+            python3 core/backtest.py --days "$DAYS" --tf "$TF" --fetch-only --save "data/sol-${TF}-${DAYS}d.json.gz"
+          fi
       - name: Commit
         run: |
           git config user.name "demo-trader[bot]"
           git config user.email "demo-trader@users.noreply.github.com"
-          git add -f "data/sol-15m-${{ inputs.days }}d.json" "reports/backtest-${{ inputs.days }}d.md"
+          git add -f data/ reports/
           git diff --cached --quiet && exit 0
-          git commit -q -m "history: ${{ inputs.days }}d of KuCoin 15m candles"
+          git commit -q -m "history: ${{ inputs.days }}d of KuCoin ${{ inputs.timeframe }} candles"
           for i in 1 2 3 4; do
             git push origin "HEAD:${GITHUB_REF_NAME}" && exit 0
             sleep $((i * 3)); git pull --rebase -q origin "${GITHUB_REF_NAME}"
