@@ -23,10 +23,10 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: "3.12"
-      - name: Backtest current params (60d)
+      - name: Backtest current params (180d)
         run: |
           mkdir -p reports data
-          python3 core/backtest.py --days 90 --save data/sol-15m.json | tee reports/backtest-latest.md
+          python3 core/backtest.py --days 180 --save data/sol-15m.json | tee reports/backtest-latest.md
       - name: Walk-forward optimise
         run: python3 core/optimize.py --file data/sol-15m.json
       - name: Commit reports

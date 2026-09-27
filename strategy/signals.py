@@ -9,7 +9,8 @@ Setups:
   through `rsi_pullback` after a dip — buy the dip inside a trend.
 - breakout: uptrend on EMA200, close breaks the prior Donchian high on volume
   > `volume_mult` x its 20-bar average — ride momentum expansion.
-Both require ATR >= `min_atr_pct` % of price so fees don't eat the edge.
+Both require the long-horizon regime filter when `regime_ema` > 0 (price above
+a multi-day EMA that rose over `regime_slope_bars`), and ATR >= `min_atr_pct` % of price so fees don't eat the edge.
 """
 import os
 import sys
@@ -32,11 +33,25 @@ def prepare(candles, p):
         "don_high": ind.highest(highs, p["donchian_len"]),
         "vol_avg": ind.sma(vols, 20),
         "vol": vols,
+        "regime": ind.ema(closes, p["regime_ema"]) if p.get("regime_ema") else None,
     }
 
 
 def warmup(p):
-    return max(p["ema_trend"], p["ema_slow"], p["donchian_len"], p["atr_len"], 20) + 2
+    return max(p["ema_trend"], p["ema_slow"], p["donchian_len"], p["atr_len"], 20,
+               p.get("regime_ema") or 0, (p.get("regime_ema") or 0) and
+               p.get("regime_ema") + p.get("regime_slope_bars", 0)) + 2
+
+
+def regime_ok(x, i, p):
+    """Long-horizon trend filter: price above a multi-day EMA that is rising."""
+    if not p.get("regime_ema"):
+        return True
+    r = x["regime"]
+    lb = p.get("regime_slope_bars", 0)
+    if r[i] is None or (lb and (i < lb or r[i - lb] is None)):
+        return False
+    return x["close"][i] > r[i] and (not lb or r[i] > r[i - lb])
 
 
 def signal(x, i, p):
@@ -49,7 +64,7 @@ def signal(x, i, p):
     close, a = x["close"][i], x["atr"][i]
     if a / close * 100 < p["min_atr_pct"]:
         return None
-    uptrend = close > x["ema_trend"][i]
+    uptrend = close > x["ema_trend"][i] and regime_ok(x, i, p)
     setups = p.get("setups", {})
 
     if setups.get("pullback") and uptrend and x["ema_fast"][i] > x["ema_slow"][i]:

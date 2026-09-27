@@ -27,7 +27,8 @@ GRID = {
     "atr_target": [5.0, 8.0, 10.0],
     "min_atr_pct": [0.3, 0.4, 0.5],
     "donchian_len": [20, 30],
-    "volume_mult": [1.2, 1.5, 2.0],
+    # (EMA bars, slope bars) of the long-horizon regime filter; 96 bars = 1 day
+    "regime": [(0, 0), (1920, 288), (2880, 288)],
 }
 MIN_TRAIN_TRADES = 12
 MIN_TEST_TRADES = 6
@@ -54,7 +55,7 @@ def evaluate(candles, split, params, cfg, signals):
 def label(p):
     setups = "+".join(k for k, v in p["setups"].items() if v) or "none"
     return (f"{setups} stop={p['atr_stop']} tgt={p['atr_target']} minatr={p['min_atr_pct']} "
-            f"donch={p['donchian_len']} vol={p['volume_mult']}")
+            f"donch={p['donchian_len']} regime={p.get('regime_ema', 0) // 96}d")
 
 
 def main():
@@ -79,10 +80,12 @@ def main():
     for combo in itertools.product(*(GRID[k] for k in keys)):
         p = dict(current)
         p.update(dict(zip(keys, combo)))
+        p["regime_ema"], p["regime_slope_bars"] = p.pop("regime")
         if p["atr_target"] <= p["atr_stop"] * 0.75:
             continue
         tr, te = evaluate(candles, split, p, cfg, signals)
-        results.append({"params": {k: p[k] for k in keys}, "train": tr, "test": te,
+        shown = [k for k in keys if k != "regime"] + ["regime_ema", "regime_slope_bars"]
+        results.append({"params": {k: p[k] for k in shown}, "train": tr, "test": te,
                         "score": score(tr)})
     results.sort(key=lambda r: r["score"], reverse=True)
     top = results[:a.top]

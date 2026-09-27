@@ -51,7 +51,9 @@ class PaperReplayTest(unittest.TestCase):
 
     def run_ticks(self, tick_times):
         d = tempfile.mkdtemp()
-        patches = {(common, "STATE"): "state.json", (common, "LEDGER"): "ledger.jsonl",
+        params = dict(common.load_json(common.PARAMS), regime_ema=0, regime_slope_bars=0)
+        common.save_json(os.path.join(d, "params.json"), params)
+        patches = {(common, "PARAMS"): "params.json", (common, "STATE"): "state.json", (common, "LEDGER"): "ledger.jsonl",
                    (common, "CYCLES"): "cycles.log", (paper, "SIGNALS"): "signals.jsonl",
                    (paper, "STATUS"): "STATUS.md"}
         saved = {k: getattr(*k) for k in patches}

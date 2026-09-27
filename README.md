@@ -21,19 +21,23 @@ Everything the bot does lands in `journal/`: `ledger.jsonl` (fills),
 `signals.jsonl` (every signal, entered or skipped and why), `cycles.log`
 (one line per tick), `STATUS.md` (current equity and stats).
 
-## Strategy (v1, `strategy/`)
+## Strategy (v3, `strategy/`)
 
-15m candles, long only (spot).
+15m candles, long only (spot). History and evidence in `strategy/changelog.md`
+and `journal/retros/`.
 
-- **Pullback**: price above EMA200, EMA21 > EMA55, RSI(14) crosses back up
-  through 42. Buys dips inside an uptrend.
-- **Breakout**: price above EMA200, close above the prior 20-bar high on
-  volume > 1.5x average.
-- Stop 1.5 ATR, target 2.5 ATR, breakeven at +1R, 2 ATR trailing stop after
-  +1R, 8h max hold, 1% equity risked per trade.
-- Skips candles whose ATR is under 0.15% of price, where fees eat the edge.
-- Daily guards: -3% day loss stops trading until 00:00 UTC; max 6 trades/day;
-  2-bar cooldown after a loss.
+- **Regime filter:** trade only when price is above its 30-day EMA and that
+  EMA has risen over the last 3 days. In the one-year backtest this is what
+  kept the bot in cash through the Oct 2025 - Feb 2026 bear market.
+- **Entry (breakout):** close above the prior 30-bar high on volume above
+  1.5x the 20-bar average, with price above its EMA200, and only when ATR is
+  at least 0.4% of price (so moves are big enough to clear fees).
+- **Exits:** stop 1.5 ATR, target 8 ATR, breakeven at +1R, 24h max hold.
+- **Risk:** 1% of equity per trade. -3% day loss stops trading until
+  00:00 UTC. Max 6 trades/day. 2-bar cooldown after a loss.
+
+One year of KuCoin data (Sep 2025 - Sep 2026, SOL -38%): v3 +11.4%, max
+drawdown 12%, 68 trades. v1 and v2 lost money over the same year.
 
 ## Honest-fill rules (`core/engine.py`)
 
