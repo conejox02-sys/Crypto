@@ -39,6 +39,8 @@ ORIGINAL = {
                              # (scaled by volatility too when vol_scale is on)
     "trend_days": 0,         # only fade in the direction of the N-day EMA of daily closes
     "entry_window_h": 24,    # first entry only in the first N hours of the session
+    "entry_mode": "market",  # "market": decide on close, fill next open (original)
+                             # "limit": resting limit orders at the levels (maker fee)
     "session_start_h": 0.0,  # 0 = midnight (crypto); NQ Globex from an ET export: 18
     # costs, per side, as fractions of notional
     "fee_taker": 0.00002,    # NQ-like: ~$4.5 RT on ~$500k notional
@@ -124,7 +126,36 @@ def run(bars, p):
             pos.append({"side": side, "px": px, "fee_in": p["fee_taker"], "n": state["entries"],
                         "tp": px * (1 + tp_mult * side), "t": b["t"]})
         pending = []
-        # 2. intrabar: cycle stop, then targets
+        # 1b. resting limit entries (entry_mode="limit"): fill when the bar trades THROUGH
+        # the level (a touch is not enough: queue position is unknown)
+        if p["entry_mode"] == "limit" and not new_session and state.get("day") == k:
+            fills = []
+            if not pos and state["entries"] == 0 and b["t"] - state["start"] < p["entry_window_h"] * 3600:
+                lo_lvl = state["open"] * (1 - state["entry"] / 100)
+                hi_lvl = state["open"] * (1 + state["entry"] / 100)
+                tr = state["trend"]
+                hit_l = (tr is None or lo_lvl >= tr) and b["l"] < lo_lvl
+                hit_s = p["allow_short"] and (tr is None or hi_lvl <= tr) and b["h"] > hi_lvl
+                if hit_l != hit_s:  # both in one bar: order unknown, take neither
+                    side = 1 if hit_l else -1
+                    lvl = lo_lvl if hit_l else hi_lvl
+                    px = min(b["o"], lvl) if side > 0 else max(b["o"], lvl)
+                    fills.append((side, px))
+                    state.update({"last": px, "cycle_open": True, "side": side, "entries": 1})
+            while (pos or fills) and state["entries"] < p["max_entries"]:
+                side = pos[0]["side"] if pos else fills[0][0]
+                lvl = state["last"] * (1 - side * state["step"] / 100)
+                if (side > 0 and b["l"] < lvl) or (side < 0 and b["h"] > lvl):
+                    px = min(b["o"], lvl) if side > 0 else max(b["o"], lvl)
+                    fills.append((side, px))
+                    state["last"] = px
+                    state["entries"] += 1
+                else:
+                    break
+            for side, px in fills:
+                pos.append({"side": side, "px": px, "fee_in": p["fee_maker"], "n": state["entries"],
+                            "tp": px * (1 + state["tp"] / 100 * side), "t": b["t"]})
+        # 2. intrabar: cycle stop, then targets (never on a lot's own fill bar: order unknown)
         if pos:
             side = pos[0]["side"]
             if state.get("stop") is not None:
@@ -148,12 +179,13 @@ def run(bars, p):
                 keep = []
                 for lot in pos:
                     hit = b["h"] >= lot["tp"] if side > 0 else b["l"] <= lot["tp"]
-                    if hit:
+                    if hit and not (p["entry_mode"] == "limit" and lot["t"] == b["t"]):
                         realized_life += close_lot(lot, lot["tp"], b["t"], "target", maker=True)
                     else:
                         keep.append(lot)
                 pos = keep
-            elif pos:  # one target for the whole position at average price + tp
+            elif pos and not (p["entry_mode"] == "limit" and any(lot["t"] == b["t"] for lot in pos)):
+                # one target for the whole position at average price + tp
                 avg = len(pos) / sum(1 / lot["px"] for lot in pos)
                 tp = avg * (1 + state["tp"] / 100 * side)
                 if (b["h"] >= tp) if side > 0 else (b["l"] <= tp):
@@ -190,6 +222,8 @@ def run(bars, p):
             continue
         if p["lifetime_stop"] is not None and realized_life <= -p["lifetime_stop"] and pos:
             pending_exit = "lifetime_stop"
+            continue
+        if p["entry_mode"] != "market":
             continue
         c = b["c"]
         chg = (c - state["open"]) / state["open"] * 100

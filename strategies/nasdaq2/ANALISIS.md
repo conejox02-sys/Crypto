@@ -98,6 +98,44 @@ stop, gana poco y de forma constante, y ningún día puede hundir la cuenta.
   son positivas en el periodo de prueba. La ventaja es pequeña (factor de
   beneficio 1,05–1,2), pero estable.
 
+## Adaptación a crypto (SOL-USDT, comisiones reales de KuCoin futuros)
+
+Probado con 0,06% taker / 0,02% maker y 0,01% de deslizamiento, 1 año de velas
+de 1 minuto, eligiendo en los primeros 8 meses y comprobando en los últimos 4.
+
+| Variante | Configuraciones probadas | En positivo el año |
+|---|---|---|
+| Blindada con promediado, entradas a mercado | 18 | **0** |
+| Blindada con promediado, entradas con orden límite | 18 | **0** |
+| Sin promediado, entrada más lejana (búsqueda amplia) | 108 | 15 |
+
+- **Con promediado no hay forma de ganar en crypto:** la ventaja que tenía con
+  costes tipo NQ (+0,5% a +3,6% al año) la comen las comisiones (~3–4% al año).
+- **Las entradas con orden límite son peores:** cuando el precio atraviesa tu
+  nivel, suele ser porque sigue de largo (selección adversa).
+- **Lo que sí funciona: una sola entrada, sin promediar**, cuando el precio se
+  ha alejado de la apertura ~0,75 veces su rango diario medio (en SOL, ~4%).
+  Objetivo ~1,3% y stop ~2,1% (escalados por volatilidad), y solo a favor de
+  la tendencia de 40 días.
+
+| Crypto, sin promediar (preset `CRYPTO`) | Resultado |
+|---|---|
+| Año completo | **+11,8%** sin apalancar |
+| Primeros 8 meses / últimos 4 (no vistos) | +8,7% / **+8,1%** |
+| Caída máxima | 6,3% |
+| Operaciones | 48 al año (~1 por semana), 73% ganadoras |
+| Ganancia media / pérdida media | +1,02% / -1,84% |
+| Peor operación | -3,3% |
+| Meses positivos | 9 de 13 |
+| Largos / cortos | 14 largos (+9,3%) / 34 cortos (+2,4%) |
+
+En el vecindario (entrada 0,8–1,25 × objetivo × stop, 45 combinaciones), 28
+son positivas y la zona de entrada 0,9–1,1 es sólida. Pero con entrada 0,8
+todas pierden, así que **el margen es estrecho**. Con 48 operaciones al año la
+muestra es pequeña: es una ventaja prometedora, no probada. Requiere futuros
+(dos tercios de las operaciones son cortos), y con apalancamiento se
+multiplican por igual la ganancia y la caída máxima.
+
 ## Lo que falta para dar un veredicto sobre NQ
 
 Todo esto está medido en **SOL**, con niveles escalados y costes tipo NQ,

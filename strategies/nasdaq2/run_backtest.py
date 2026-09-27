@@ -27,6 +27,9 @@ COSTS = {
 ORIGINAL = {}
 PROTECTED = {"vol_scale": True, "tp_mode": "per_lot", "tp_pct": 0.3, "cycle_stop_pct": 0.2,
              "trend_days": 40, "lifetime_stop": None}
+# Crypto adaptation (KuCoin futures fees): no averaging, entry further out, wider stop.
+CRYPTO = {"vol_scale": True, "tp_mode": "per_lot", "max_entries": 1, "entry_pct": 1.0, "tp_pct": 0.3,
+          "cycle_stop_pct": 0.5, "trend_days": 40, "lifetime_stop": None}
 
 
 def main():
@@ -48,7 +51,8 @@ def main():
     print(f"{len(bars)} bars, session start {start:g}h, costs {a.costs}")
     for name, p in (("ORIGINAL (as written, incl. the CumProfit stop)", ORIGINAL),
                     ("ORIGINAL without the CumProfit bug", {"lifetime_stop": None}),
-                    ("PROTECTED (nasdaq2_blindada defaults)", PROTECTED)):
+                    ("PROTECTED (nasdaq2_blindada defaults)", PROTECTED),
+                    ("CRYPTO (single entry, no averaging)", CRYPTO)):
         p = dict(p, session_start_h=start, **COSTS[a.costs])
         cycles, lots = fade.run(bars, p)
         print(f"\n== {name}\n" + json.dumps(fade.report(cycles, lots, p, 0), indent=2))

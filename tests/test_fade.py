@@ -65,6 +65,16 @@ class FadePortTest(unittest.TestCase):
         self.assertEqual(cycles[1]["reason"], "lifetime_stop")
 
 
+    def test_limit_entry_needs_trade_through_and_pays_maker(self):
+        p = dict(ZERO, entry_mode="limit", fee_maker=0.0002)
+        touch = bars([(100, 100, 100, 100), (100, 100, 99.5, 99.6), (99.6, 99.7, 99.6, 99.7)])
+        self.assertEqual(fade.run(touch, p)[1], [])  # touched 99.5, never traded through
+        through = bars([(100, 100, 100, 100), (100, 100, 99.4, 99.45), (99.45, 99.7, 99.45, 99.7)])
+        cycles, lots = fade.run(through, p)
+        self.assertAlmostEqual(lots[0]["entry"], 99.5)
+        self.assertEqual(lots[0]["reason"], "target")  # on the NEXT bar, not the fill bar
+        self.assertAlmostEqual(lots[0]["pnl"], 0.001 - 0.0002 - 0.0002, places=6)
+
     def test_ninjatrader_export_loader(self):
         import tempfile
         path = os.path.join(tempfile.mkdtemp(), "NQ.txt")
