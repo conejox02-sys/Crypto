@@ -1,0 +1,43 @@
+name: Fetch history
+
+# One-off: download N days of KuCoin 15m candles into data/ for long backtests.
+on:
+  workflow_dispatch:
+    inputs:
+      days:
+        description: "Days of history to download"
+        default: "365"
+
+permissions:
+  contents: write
+
+concurrency:
+  group: journal-writer
+  cancel-in-progress: false
+
+jobs:
+  fetch:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Download and backtest
+        run: |
+          mkdir -p reports data
+          python3 core/backtest.py --days "${{ inputs.days }}" --save "data/sol-15m-${{ inputs.days }}d.json" \
+            | tee "reports/backtest-${{ inputs.days }}d.md"
+      - name: Commit
+        run: |
+          git config user.name "demo-trader[bot]"
+          git config user.email "demo-trader@users.noreply.github.com"
+          git add -f "data/sol-15m-${{ inputs.days }}d.json" "reports/backtest-${{ inputs.days }}d.md"
+          git diff --cached --quiet && exit 0
+          git commit -q -m "history: ${{ inputs.days }}d of KuCoin 15m candles"
+          for i in 1 2 3 4; do
+            git push origin "HEAD:${GITHUB_REF_NAME}" && exit 0
+            sleep $((i * 3)); git pull --rebase -q origin "${GITHUB_REF_NAME}"
+          done
+          exit 1
