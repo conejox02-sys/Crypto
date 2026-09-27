@@ -1,0 +1,53 @@
+name: Multi-coin fade test
+
+# Downloads 1m history for several KuCoin pairs on the runner (not committed:
+# too large) and backtests the single-entry day-trading fade on each.
+on:
+  workflow_dispatch:
+    inputs:
+      symbols:
+        description: "KuCoin pairs, space separated"
+        default: "SOL-USDT BTC-USDT ETH-USDT XRP-USDT DOGE-USDT BNB-USDT"
+      days:
+        default: "365"
+
+permissions:
+  contents: write
+
+concurrency:
+  group: journal-writer
+  cancel-in-progress: false
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Download
+        env:
+          SYMBOLS: ${{ inputs.symbols }}
+          DAYS: ${{ inputs.days }}
+        run: |
+          mkdir -p "$RUNNER_TEMP/coins"
+          for s in $SYMBOLS; do
+            python3 core/backtest.py --symbol "$s" --tf 1m --days "$DAYS" --fetch-only \
+              --save "$RUNNER_TEMP/coins/$(echo "$s" | tr 'A-Z' 'a-z')-1m-${DAYS}d.json.gz"
+          done
+      - name: Backtest
+        run: python3 strategies/nasdaq2/multi_coin.py "$RUNNER_TEMP"/coins/*.json.gz
+      - name: Commit report
+        run: |
+          git config user.name "demo-trader[bot]"
+          git config user.email "demo-trader@users.noreply.github.com"
+          git add reports/multi-coin-fade.md
+          git diff --cached --quiet && exit 0
+          git commit -q -m "research: multi-coin day-trading fade report"
+          for i in 1 2 3 4; do
+            git push origin "HEAD:${GITHUB_REF_NAME}" && exit 0
+            sleep $((i * 3)); git pull --rebase -q origin "${GITHUB_REF_NAME}"
+          done
+          exit 1

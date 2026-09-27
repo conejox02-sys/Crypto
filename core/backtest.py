@@ -51,11 +51,11 @@ def run(candles, params, cfg, signals, start_index=None):
     return events, acct, curve
 
 
-def fetch(cfg, days, tf=None):
+def fetch(cfg, days, tf=None, symbol=None):
     tf = tf or cfg["timeframe"]
     end = int(time.time())
     start = end - days * 86400
-    rows, src = market.candles(cfg["symbol"], tf, start, end)
+    rows, src = market.candles(symbol or cfg["symbol"], tf, start, end)
     return market.closed_only(rows, tf, end), src
 
 
@@ -68,13 +68,14 @@ def main():
     ap.add_argument("--json", action="store_true")
     ap.add_argument("--tf", help="candle timeframe to fetch (default: config timeframe)")
     ap.add_argument("--fetch-only", action="store_true", help="save candles, skip the backtest")
+    ap.add_argument("--symbol", help="symbol to fetch (default: config symbol)")
     a = ap.parse_args()
     cfg = common.load_json(common.CONFIG)
     params = common.load_json(a.params)
     if a.file:
         candles, src = common.load_json(a.file), "file:" + a.file
     else:
-        candles, src = fetch(cfg, a.days, a.tf)
+        candles, src = fetch(cfg, a.days, a.tf, a.symbol)
         if a.save:
             os.makedirs(os.path.dirname(os.path.abspath(a.save)), exist_ok=True)
             opener = gzip.open if a.save.endswith(".gz") else open
