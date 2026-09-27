@@ -4,13 +4,17 @@
     python3 core/paper.py status    # print the account summary
     python3 core/paper.py reset     # wipe the demo account (asks no questions)
 
-Each tick:
-1. Manages the open position through every CLOSED 1-minute candle since the
-   last tick (the stop and target behave like resting exchange orders).
-2. Evaluates the entry signal on the latest CLOSED strategy candle, once per
-   candle. A signal found more than one candle late (a delayed runner) is
-   logged as stale and skipped, never back-filled.
-3. Enters at the live best ask plus slippage and fee.
+Each tick catches up on every strategy candle that closed since the last tick
+(GitHub's scheduler drops many runs, so gaps of hours are normal):
+1. The open position is managed through each CLOSED 1-minute candle; the stop
+   and target behave like resting exchange orders.
+2. Each missed strategy candle is evaluated in order, exactly as a bot running
+   continuously would have: a signal on candle i fills at the open of the first
+   1-minute candle after it closed (fill="replay"). Nothing after that moment
+   is used for the decision.
+3. A signal on the latest candle, found within one candle of its close, fills at
+   the live best ask (fill="live").
+Slippage and fees apply to both. Catch-up is capped at MAX_CATCHUP_H hours.
 Every signal, fill and skip is journaled, with the data source that answered.
 """
 import os
@@ -31,6 +35,9 @@ def iso(ts):
     return time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime(ts))
 
 
+MAX_CATCHUP_H = 48
+
+
 def tick(now=None):
     now = int(now or time.time())
     cfg = common.load_json(common.CONFIG)
@@ -42,57 +49,91 @@ def tick(now=None):
     acct = engine.Account(cfg, params, state.get("account"))
     events, sig_rows, notes = [], [], []
 
-    # 1. Manage the open position on 1m candles.
-    if acct.pos:
-        since = state.get("managed_until", acct.pos["entry_ts"])
-        m1, src1 = market.candles(sym, "1m", since, now)
-        for b in market.closed_only(m1, "1m", now):
-            if b["t"] < since:
-                continue
-            ev = acct.on_bar(b, 60)
-            state["managed_until"] = b["t"] + 60
-            if ev:
-                ev.update({"mode": "paper", "source": src1})
-                events.append(ev)
-                notes.append(f"exit {ev['reason']} pnl {ev['pnl']:+.2f}")
-                break
-
-    # 2. Signal on the latest closed strategy candle.
+    # Strategy candles: warm-up history plus everything missed since the last tick.
+    horizon = now - MAX_CATCHUP_H * 3600
+    last_eval = max(state.get("last_signal_bar", now), horizon)
     lookback = (signals.warmup(acct.p) + 20) * step
-    rows, src = market.candles(sym, tf, now - lookback, now)
+    rows, src = market.candles(sym, tf, min(last_eval, now) - lookback, now)
     closed = market.closed_only(rows, tf, now)
     if not closed:
         raise RuntimeError("no closed candles returned")
-    last = closed[-1]
-    mark = last["c"]
-    if state.get("last_signal_bar") != last["t"]:
-        state["last_signal_bar"] = last["t"]
-        x = signals.prepare(closed, acct.p)
-        sig = signals.signal(x, len(closed) - 1, acct.p)
-        if sig:
-            row = {"ts": now, "bar": last["t"], "setup": sig["setup"], "close": last["c"],
-                   "atr": round(sig["atr"], 4), "source": src}
-            late = now - (last["t"] + step)
+    if "last_signal_bar" not in state:  # first tick ever: only the latest candle
+        last_eval = closed[-1]["t"] - 1
+    pending = [i for i, c in enumerate(closed) if c["t"] > last_eval]
+    x = signals.prepare(closed, acct.p)
+    mark = closed[-1]["c"]
+
+    # 1-minute candles covering the open position and the missed window.
+    starts = [closed[i]["t"] + step for i in pending]
+    if acct.pos:
+        starts.append(state.get("managed_until", acct.pos["entry_ts"]))
+    m1, src1 = ([], None)
+    if starts and min(starts) < now:
+        m1, src1 = market.candles(sym, "1m", min(starts), now)
+        m1 = market.closed_only(m1, "1m", now)
+    j = 0
+
+    def manage_until(ts):
+        nonlocal j
+        while j < len(m1) and m1[j]["t"] + 60 <= ts:
+            b = m1[j]
+            j += 1
+            if acct.pos and b["t"] >= state.get("managed_until", 0):
+                state["managed_until"] = b["t"] + 60
+                ev = acct.on_bar(b, 60)
+                if ev:
+                    ev.update({"mode": "paper", "source": src1})
+                    events.append(ev)
+                    notes.append(f"exit {ev['reason']} pnl {ev['pnl']:+.2f}")
+
+    for i in pending:
+        bar = closed[i]
+        close_ts = bar["t"] + step
+        ev = None
+        manage_until(close_ts)
+        state["last_signal_bar"] = bar["t"]
+        if acct.pos:
+            continue
+        sig = signals.signal(x, i, acct.p)
+        if not sig:
+            continue
+        row = {"ts": now, "bar": bar["t"], "setup": sig["setup"], "close": bar["c"],
+               "atr": round(sig["atr"], 4), "source": src}
+        live = i == len(closed) - 1 and now - close_ts <= step
+        if live:
             ok, why = acct.can_enter(now, mark)
-            if late > step:
-                ok, why = False, f"stale_by_{late}s"
             if ok:
                 tk, tsrc = market.ticker(sym)
                 ev = acct.enter(now, tk["ask"], sig)
                 if ev:
-                    ev.update({"mode": "paper", "source": tsrc, "bid": tk["bid"], "ask": tk["ask"],
-                               "signal_bar": last["t"]})
-                    events.append(ev)
+                    ev.update({"fill": "live", "source": tsrc, "bid": tk["bid"], "ask": tk["ask"]})
                     state["managed_until"] = (now // 60 + 1) * 60
                     mark = tk["last"]
-                    notes.append(f"entry {sig['setup']} @ {ev['price']}")
-                    row["action"] = "entered"
-                else:
-                    row["action"] = "skipped:size_below_min"
+        else:
+            nxt = next((b for b in m1[j:] if b["t"] >= close_ts), None)
+            if nxt is None:
+                ok, why = False, "no_1m_data_after_signal"
             else:
-                row["action"] = "skipped:" + why
-                notes.append(f"signal {sig['setup']} skipped ({why})")
-            sig_rows.append(row)
+                ok, why = acct.can_enter(nxt["t"], nxt["o"])
+                if ok:
+                    ev = acct.enter(nxt["t"], nxt["o"], sig)
+                    if ev:
+                        ev.update({"fill": "replay", "source": src1})
+                        state["managed_until"] = nxt["t"]
+        if ok and ev:
+            ev.update({"mode": "paper", "signal_bar": bar["t"]})
+            events.append(ev)
+            notes.append(f"entry {sig['setup']} ({ev['fill']}) @ {ev['price']}")
+            row["action"] = "entered_" + ev["fill"]
+        elif ok:
+            row["action"] = "skipped:size_below_min"
+        else:
+            row["action"] = "skipped:" + why
+            notes.append(f"signal {sig['setup']} skipped ({why})")
+        sig_rows.append(row)
+    manage_until(now + 60)
+    if m1:
+        mark = m1[-1]["c"]
 
     common.append_jsonl(common.LEDGER, events)
     common.append_jsonl(SIGNALS, sig_rows)

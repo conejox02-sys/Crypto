@@ -4,7 +4,7 @@ name: Daily research
 # parameter changes in reports/; never applies them (see IMPROVE.md).
 on:
   schedule:
-    - cron: "11 5 * * *"
+    - cron: "11 5,17 * * *"   # twice: GitHub drops scheduled runs under load
   workflow_dispatch:
 
 permissions:

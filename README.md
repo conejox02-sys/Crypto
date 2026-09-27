@@ -13,8 +13,8 @@ KuCoin spot.
 
 | Piece | What it does | When |
 |---|---|---|
-| `core/paper.py tick` | Demo account: manages the open position on 1m candles, checks the entry signal on the latest closed 15m candle, fills at the live KuCoin ask | GitHub Actions, every 15 min (`.github/workflows/paper.yml`) |
-| `core/optimize.py` | Walk-forward research on 60 days of 15m candles: ranks ~300 param combos on the first 2/3, checks them out of sample on the last 1/3 | Daily 05:11 UTC (`research.yml`) |
+| `core/paper.py tick` | Demo account: manages the open position on 1m candles, checks the entry signal on the latest closed 15m candle, fills at the live KuCoin ask | GitHub Actions, every 15 min, catches up on missed runs (`.github/workflows/paper.yml`) |
+| `core/optimize.py` | Walk-forward research on 60 days of 15m candles: ranks ~300 param combos on the first 2/3, checks them out of sample on the last 1/3 | 05:11 and 17:11 UTC (`research.yml`) |
 | `IMPROVE.md` | The retro procedure: read the ledger + research, change params only with cited evidence | Daily, by Claude Code |
 
 Everything the bot does lands in `journal/`: `ledger.jsonl` (fills),
@@ -43,8 +43,12 @@ Everything the bot does lands in `journal/`: `ledger.jsonl` (fills),
 - If one candle touches both the stop and the target, the stop is assumed to
   have filled first.
 - The backtest enters at the next bar's open. The demo account enters at the
-  live ask. A signal found more than one candle late is skipped, never
-  back-filled.
+  live ask when it sees the signal within one candle.
+- GitHub's scheduler drops many runs, so each tick catches up on every candle
+  it missed (up to 48h) exactly as a continuously running bot would have:
+  entry at the open of the first minute after the signal candle, exits checked
+  minute by minute. These fills are tagged `"fill": "replay"`; nothing after
+  the decision moment is used to make it.
 
 ## Guardrails
 
