@@ -136,6 +136,26 @@ muestra es pequeña: es una ventaja prometedora, no probada. Requiere futuros
 (dos tercios de las operaciones son cortos), y con apalancamiento se
 multiplican por igual la ganancia y la caída máxima.
 
+### Prueba en otras 5 monedas (datos nunca vistos): no se sostiene
+
+La versión sin promediar se eligió con SOL. Aplicada tal cual a BTC, ETH, XRP,
+DOGE y BNB (1 año, velas de 1 minuto, comisiones de KuCoin futuros; informe
+completo en `reports/multi-coin-fade.md`):
+
+| Moneda | Resultado del año (entrada 1,0) |
+|---|---|
+| SOL (donde se eligió) | +11,7% |
+| BTC | -3,2% |
+| ETH | -3,7% |
+| BNB | -7,9% |
+| XRP | -12,2% |
+| DOGE | -20,8% |
+| **Cartera de las 6** | **-6,0%**, 0,8 operaciones al día |
+
+Con entrada 0,9 la cartera da -6,5%, y con 1,1 da -1,7%. **La ganancia en SOL
+era casualidad de esa moneda, no una ventaja real:** en 5 de las 6 monedas
+pierde. Veredicto: **no usar esta estrategia en crypto.**
+
 ## Lo que falta para dar un veredicto sobre NQ
 
 Todo esto está medido en **SOL**, con niveles escalados y costes tipo NQ,
