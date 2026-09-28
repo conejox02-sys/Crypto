@@ -11,3 +11,4 @@
 2026-09-28T01:06:05Z tick src=kucoin px=121.710 equity=1000.00 flat
 2026-09-28T07:01:46Z tick src=kucoin px=118.850 equity=1000.00 flat
 2026-09-28T15:21:38Z tick src=kucoin px=117.820 equity=1000.00 flat
+2026-09-28T21:21:04Z tick src=kucoin px=118.720 equity=987.87 flat | entry breakout (replay) @ 120.5662; exit stop pnl -12.13
