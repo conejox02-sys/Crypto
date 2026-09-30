@@ -6,7 +6,7 @@
 - win_rate_pct: 25.0
 - net_pnl: 235.18
 - return_pct: 23.52
-- buy_and_hold_pct: 51.28
+- buy_and_hold_pct: 49.69
 - profit_factor: 1.81
 - avg_r: 0.549
 - fees: 105.73
