@@ -1,16 +1,16 @@
 {
   "account": {
-    "cash": 987.5684007742548,
-    "cooldown_until": 1790692080,
-    "day": "2026-09-29",
-    "day_pnl": -0.29833318776877604,
-    "day_start_equity": 987.8667339620235,
+    "cash": 987.2701576823337,
+    "cooldown_until": 1790775120,
+    "day": "2026-09-30",
+    "day_pnl": -0.2982430919211083,
+    "day_start_equity": 987.5684007742548,
     "pos": null,
-    "trade_seq": 2,
+    "trade_seq": 3,
     "trades_today": 1
   },
-  "last_price": 118.12,
-  "last_signal_bar": 1790756100,
-  "last_tick": "2026-09-30T08:39:56Z",
-  "managed_until": 1790690280
+  "last_price": 118.64,
+  "last_signal_bar": 1790780400,
+  "last_tick": "2026-09-30T15:22:39Z",
+  "managed_until": 1790773320
 }
