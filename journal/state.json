@@ -1,29 +1,16 @@
 {
   "account": {
-    "cash": 0.0,
-    "cooldown_until": 1790775120,
+    "cash": 977.5343897181335,
+    "cooldown_until": 1790884560,
     "day": "2026-10-01",
-    "day_pnl": 0.0,
+    "day_pnl": -9.735767964200136,
     "day_start_equity": 987.2701576823337,
-    "pos": {
-      "atr": 0.6013786790069477,
-      "entry": 118.985685,
-      "entry_fee": 0.9862838738085252,
-      "entry_ts": 1790876700,
-      "equity_at_entry": 987.2701576823337,
-      "high": 119.0,
-      "id": 4,
-      "init_stop": 118.08361698148958,
-      "qty": 8.289096909502392,
-      "setup": "breakout",
-      "stop": 118.08361698148958,
-      "target": 123.79671443205558
-    },
+    "pos": null,
     "trade_seq": 4,
     "trades_today": 1
   },
-  "last_price": 118.44,
-  "last_signal_bar": 1790877600,
-  "last_tick": "2026-10-01T18:22:35Z",
-  "managed_until": 1790878920
+  "last_price": 117.87,
+  "last_signal_bar": 1790893800,
+  "last_tick": "2026-10-01T22:52:03Z",
+  "managed_until": 1790882760
 }
