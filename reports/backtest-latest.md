@@ -2,20 +2,20 @@
 
 - source: kucoin
 - bars: 17279
-- trades: 49
-- win_rate_pct: 24.5
-- net_pnl: 234.81
-- return_pct: 23.48
-- buy_and_hold_pct: 46.72
-- profit_factor: 1.81
-- avg_r: 0.537
-- fees: 108.2
+- trades: 48
+- win_rate_pct: 25.0
+- net_pnl: 245.25
+- return_pct: 24.52
+- buy_and_hold_pct: 46.87
+- profit_factor: 1.87
+- avg_r: 0.576
+- fees: 107.11
 - max_drawdown_pct: 7.16
 
 | slice | trades | win% | net | avg R | PF |
 |---|---|---|---|---|---|
-| exit:stop | 26 | 0.0 | -284.91 | -1.309 | 0.0 |
-| exit:stop_gap | 1 | 0.0 | -0.76 | -0.101 | 0.0 |
-| exit:target | 12 | 100.0 | 523.84 | 5.067 | inf |
-| exit:trail_stop | 10 | 0.0 | -3.36 | -0.039 | 0.0 |
-| setup:breakout | 49 | 24.5 | 234.81 | 0.537 | 1.81 |
+| exit:stop | 25 | 0.0 | -278.87 | -1.306 | 0.0 |
+| exit:stop_gap | 1 | 0.0 | -0.77 | -0.101 | 0.0 |
+| exit:target | 12 | 100.0 | 528.27 | 5.067 | inf |
+| exit:trail_stop | 10 | 0.0 | -3.39 | -0.039 | 0.0 |
+| setup:breakout | 48 | 25.0 | 245.25 | 0.576 | 1.87 |
