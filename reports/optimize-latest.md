@@ -1,9 +1,9 @@
-# Walk-forward research 2026-10-30
+# Walk-forward research 2026-10-31
 
-- data: file:data/sol-15m.json, 17279 x 15m bars, 2026-05-03 21:30 to 2026-10-30 21:00 UTC
+- data: file:data/sol-15m.json, 17279 x 15m bars, 2026-05-04 11:00 to 2026-10-31 10:30 UTC
 - train: first 11519 bars; test (out of sample): last 5760 bars
-- buy & hold over test: -8.20%
-- combos: 324 in 34s
+- buy & hold over test: -6.51%
+- combos: 324 in 36s
 
 | config | train ret% | train PF | train n | train DD% | TEST ret% | TEST PF | TEST n | TEST DD% |
 |---|---|---|---|---|---|---|---|---|
