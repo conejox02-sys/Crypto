@@ -1,23 +1,23 @@
 # Walk-forward research 2026-11-10
 
-- data: file:data/sol-15m.json, 17279 x 15m bars, 2026-05-14 00:45 to 2026-11-10 00:15 UTC
+- data: file:data/sol-15m.json, 17279 x 15m bars, 2026-05-14 13:30 to 2026-11-10 13:00 UTC
 - train: first 11519 bars; test (out of sample): last 5760 bars
-- buy & hold over test: -12.36%
-- combos: 324 in 28s
+- buy & hold over test: -16.06%
+- combos: 324 in 29s
 
 | config | train ret% | train PF | train n | train DD% | TEST ret% | TEST PF | TEST n | TEST DD% |
 |---|---|---|---|---|---|---|---|---|
-| **current params** | 6.55 | 1.36 | 28 | 7.16 | 8.39 | 2.06 | 17 | 5.66 |
-| breakout stop=1.0 tgt=5.0 minatr=0.5 donch=30 regime=30d | 10.44 | 2.33 | 20 | 3.23 | -2.3 | 0.68 | 12 | 4.02 |
-| breakout stop=1.0 tgt=10.0 minatr=0.5 donch=30 regime=20d | 12.55 | 2.27 | 21 | 4.04 | 4.47 | 1.78 | 10 | 4.02 |
-| breakout stop=1.0 tgt=10.0 minatr=0.5 donch=20 regime=20d | 11.2 | 2.0 | 22 | 4.04 | 3.43 | 1.52 | 12 | 4.82 |
-| breakout stop=1.0 tgt=10.0 minatr=0.5 donch=30 regime=30d | 10.35 | 2.69 | 15 | 4.21 | 3.68 | 1.57 | 11 | 4.02 |
-| breakout stop=1.0 tgt=5.0 minatr=0.4 donch=20 regime=30d | 10.73 | 1.65 | 38 | 4.48 | -4.55 | 0.59 | 25 | 7.14 |
-| breakout stop=1.0 tgt=5.0 minatr=0.5 donch=30 regime=20d | 9.44 | 1.83 | 26 | 4.04 | -1.55 | 0.76 | 11 | 4.02 |
-| breakout stop=1.0 tgt=5.0 minatr=0.4 donch=30 regime=30d | 9.06 | 1.7 | 33 | 3.93 | -2.26 | 0.75 | 21 | 4.62 |
-| breakout stop=1.0 tgt=8.0 minatr=0.5 donch=30 regime=20d | 8.19 | 1.78 | 22 | 4.21 | 2.4 | 1.43 | 10 | 4.02 |
-| breakout stop=1.0 tgt=5.0 minatr=0.5 donch=20 regime=30d | 8.03 | 1.79 | 23 | 4.14 | -3.22 | 0.59 | 15 | 5.22 |
-| breakout stop=1.0 tgt=5.0 minatr=0.4 donch=20 regime=20d | 8.98 | 1.44 | 45 | 4.69 | -4.89 | 0.49 | 22 | 7.14 |
+| **current params** | 6.92 | 1.38 | 29 | 7.16 | 2.5 | 1.29 | 17 | 5.66 |
+| breakout stop=1.0 tgt=5.0 minatr=0.5 donch=30 regime=30d | 10.41 | 2.32 | 21 | 3.23 | -2.27 | 0.68 | 11 | 4.02 |
+| breakout stop=1.0 tgt=10.0 minatr=0.5 donch=30 regime=20d | 12.52 | 2.26 | 22 | 4.04 | 4.51 | 1.79 | 9 | 4.02 |
+| breakout stop=1.0 tgt=10.0 minatr=0.5 donch=20 regime=20d | 11.17 | 1.99 | 23 | 4.04 | 3.46 | 1.53 | 11 | 4.82 |
+| breakout stop=1.0 tgt=10.0 minatr=0.5 donch=30 regime=30d | 10.31 | 2.67 | 16 | 4.21 | 3.71 | 1.58 | 10 | 4.02 |
+| breakout stop=1.0 tgt=5.0 minatr=0.4 donch=20 regime=30d | 10.7 | 1.65 | 39 | 4.51 | -4.52 | 0.59 | 24 | 7.14 |
+| breakout stop=1.0 tgt=5.0 minatr=0.5 donch=30 regime=20d | 9.41 | 1.82 | 27 | 4.04 | -1.52 | 0.76 | 10 | 4.02 |
+| breakout stop=1.0 tgt=5.0 minatr=0.4 donch=30 regime=30d | 9.03 | 1.7 | 34 | 3.93 | -2.23 | 0.75 | 20 | 4.62 |
+| breakout stop=1.0 tgt=8.0 minatr=0.5 donch=30 regime=20d | 8.15 | 1.78 | 23 | 4.21 | 2.43 | 1.43 | 9 | 4.02 |
+| breakout stop=1.0 tgt=5.0 minatr=0.5 donch=20 regime=30d | 8.0 | 1.79 | 24 | 4.17 | -3.19 | 0.59 | 14 | 5.22 |
+| breakout stop=1.0 tgt=5.0 minatr=0.4 donch=20 regime=20d | 8.95 | 1.44 | 46 | 4.69 | -4.86 | 0.49 | 21 | 7.14 |
 
 ## Verdict
 
