@@ -1,24 +1,24 @@
-# Walk-forward research 2026-11-19
+# Walk-forward research 2026-11-20
 
-- data: file:data/sol-15m.json, 17279 x 15m bars, 2026-05-23 23:45 to 2026-11-19 23:15 UTC
+- data: file:data/sol-15m.json, 17279 x 15m bars, 2026-05-24 14:00 to 2026-11-20 13:30 UTC
 - train: first 11519 bars; test (out of sample): last 5760 bars
-- buy & hold over test: -34.07%
-- combos: 324 in 30s
+- buy & hold over test: -40.09%
+- combos: 324 in 22s
 
 | config | train ret% | train PF | train n | train DD% | TEST ret% | TEST PF | TEST n | TEST DD% |
 |---|---|---|---|---|---|---|---|---|
-| **current params** | 22.42 | 2.05 | 36 | 7.16 | -1.32 | 0.76 | 11 | 5.66 |
-| breakout stop=1.0 tgt=10.0 minatr=0.5 donch=30 regime=30d | 19.42 | 3.08 | 21 | 3.94 | 0.65 | 1.15 | 7 | 4.02 |
-| breakout stop=1.0 tgt=10.0 minatr=0.5 donch=30 regime=20d | 19.03 | 3.03 | 22 | 3.94 | 0.65 | 1.15 | 7 | 4.02 |
-| breakout stop=1.0 tgt=10.0 minatr=0.5 donch=20 regime=30d | 17.99 | 2.68 | 22 | 3.94 | -0.36 | 0.93 | 9 | 4.82 |
-| breakout stop=1.0 tgt=10.0 minatr=0.5 donch=20 regime=20d | 17.61 | 2.64 | 23 | 3.94 | -0.36 | 0.93 | 9 | 4.82 |
-| breakout stop=1.5 tgt=10.0 minatr=0.5 donch=30 regime=30d | 18.9 | 2.91 | 19 | 5.94 | -0.74 | 0.87 | 7 | 5.36 |
-| breakout stop=1.0 tgt=8.0 minatr=0.5 donch=30 regime=20d | 13.3 | 2.34 | 23 | 4.21 | -0.37 | 0.92 | 7 | 4.02 |
-| breakout stop=1.5 tgt=8.0 minatr=0.4 donch=30 regime=30d | 22.42 | 2.05 | 36 | 7.16 | -1.32 | 0.76 | 11 | 5.66 |
-| breakout stop=1.5 tgt=5.0 minatr=0.5 donch=30 regime=30d | 16.53 | 2.26 | 26 | 5.46 | -3.27 | 0.43 | 7 | 5.36 |
-| breakout stop=1.0 tgt=5.0 minatr=0.5 donch=30 regime=20d | 11.91 | 2.0 | 28 | 4.01 | -1.91 | 0.56 | 7 | 4.02 |
-| breakout stop=1.5 tgt=10.0 minatr=0.5 donch=20 regime=30d | 17.52 | 2.57 | 20 | 5.94 | -2.95 | 0.63 | 9 | 7.55 |
+| **current params** | 25.88 | 2.21 | 38 | 7.16 | -5.16 | 0.0 | 9 | 5.66 |
+| breakout stop=1.0 tgt=10.0 minatr=0.5 donch=30 regime=30d | 22.5 | 3.33 | 23 | 3.94 | -4.02 | 0.0 | 5 | 4.02 |
+| breakout stop=1.0 tgt=10.0 minatr=0.5 donch=30 regime=20d | 22.11 | 3.28 | 24 | 3.94 | -4.02 | 0.0 | 5 | 4.02 |
+| breakout stop=1.0 tgt=10.0 minatr=0.5 donch=20 regime=30d | 21.74 | 2.98 | 24 | 3.94 | -4.82 | 0.0 | 7 | 4.82 |
+| breakout stop=1.0 tgt=10.0 minatr=0.5 donch=20 regime=20d | 21.35 | 2.93 | 25 | 3.94 | -4.82 | 0.0 | 7 | 4.82 |
+| breakout stop=1.0 tgt=8.0 minatr=0.5 donch=30 regime=20d | 16.23 | 2.58 | 25 | 4.21 | -4.02 | 0.0 | 5 | 4.02 |
+| breakout stop=1.0 tgt=8.0 minatr=0.5 donch=20 regime=20d | 16.04 | 2.39 | 26 | 4.21 | -4.82 | 0.0 | 7 | 4.82 |
+| breakout stop=1.5 tgt=10.0 minatr=0.5 donch=30 regime=30d | 21.97 | 3.15 | 21 | 5.94 | -5.36 | 0.0 | 5 | 5.36 |
+| breakout stop=1.5 tgt=8.0 minatr=0.4 donch=30 regime=30d | 25.88 | 2.21 | 38 | 7.16 | -5.16 | 0.0 | 9 | 5.66 |
+| breakout stop=1.0 tgt=5.0 minatr=0.5 donch=30 regime=20d | 14.38 | 2.17 | 30 | 4.01 | -4.02 | 0.0 | 5 | 4.02 |
+| breakout stop=1.5 tgt=10.0 minatr=0.5 donch=20 regime=30d | 21.26 | 2.85 | 22 | 5.94 | -7.29 | 0.0 | 7 | 7.55 |
 
 ## Verdict
 
-RECOMMEND: `{"setups": {"pullback": false, "breakout": true}, "atr_stop": 1.0, "atr_target": 10.0, "min_atr_pct": 0.5, "donchian_len": 30, "regime_ema": 2880, "regime_slope_bars": 288}` - best on train and beats current params out of sample. Apply via IMPROVE.md only if the live demo ledger does not contradict it.
+KEEP current params: no train-best config beat them out of sample with >= 6 trades and PF > 1.1.
