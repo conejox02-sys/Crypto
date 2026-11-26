@@ -9,8 +9,8 @@
     "trade_seq": 6,
     "trades_today": 2
   },
-  "last_price": 71.12,
-  "last_signal_bar": 1795703400,
-  "last_tick": "2026-11-26T14:57:51Z",
+  "last_price": 71.0,
+  "last_signal_bar": 1795734900,
+  "last_tick": "2026-11-26T23:43:18Z",
   "managed_until": 1790919480
 }
