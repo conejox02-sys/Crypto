@@ -1,13 +1,13 @@
 # Walk-forward research 2026-11-28
 
-- data: file:data/sol-15m.json, 17279 x 15m bars, 2026-06-01 00:30 to 2026-11-28 00:00 UTC
+- data: file:data/sol-15m.json, 17279 x 15m bars, 2026-06-01 14:15 to 2026-11-28 13:45 UTC
 - train: first 11519 bars; test (out of sample): last 5760 bars
-- buy & hold over test: -39.58%
-- combos: 324 in 36s
+- buy & hold over test: -41.71%
+- combos: 324 in 23s
 
 | config | train ret% | train PF | train n | train DD% | TEST ret% | TEST PF | TEST n | TEST DD% |
 |---|---|---|---|---|---|---|---|---|
-| **current params** | 15.03 | 1.65 | 39 | 7.16 | -1.11 | 0.0 | 4 | 1.85 |
+| **current params** | 15.92 | 1.71 | 39 | 7.16 | -1.05 | 0.0 | 3 | 1.8 |
 | breakout stop=1.0 tgt=10.0 minatr=0.5 donch=30 regime=20d | 20.29 | 2.46 | 28 | 3.94 | -1.48 | 0.0 | 2 | 1.48 |
 | breakout stop=1.0 tgt=10.0 minatr=0.5 donch=20 regime=20d | 17.66 | 2.09 | 31 | 3.94 | -1.48 | 0.0 | 2 | 1.48 |
 | breakout stop=1.0 tgt=10.0 minatr=0.5 donch=30 regime=30d | 14.5 | 2.14 | 24 | 3.94 | -1.48 | 0.0 | 2 | 1.48 |

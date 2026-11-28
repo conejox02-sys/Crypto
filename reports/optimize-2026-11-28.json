@@ -2,22 +2,22 @@
   "bars": 17279,
   "current": {
     "test": {
-      "avg_r": -0.373,
-      "fees": 7.96,
-      "max_drawdown_pct": 1.85,
-      "net_pnl": -11.07,
+      "avg_r": -0.464,
+      "fees": 5.97,
+      "max_drawdown_pct": 1.8,
+      "net_pnl": -10.46,
       "profit_factor": 0.0,
-      "return_pct": -1.11,
-      "trades": 4,
+      "return_pct": -1.05,
+      "trades": 3,
       "win_rate_pct": 0.0
     },
     "train": {
-      "avg_r": 0.426,
-      "fees": 80.83,
+      "avg_r": 0.458,
+      "fees": 81.83,
       "max_drawdown_pct": 7.16,
-      "net_pnl": 150.33,
-      "profit_factor": 1.65,
-      "return_pct": 15.03,
+      "net_pnl": 159.15,
+      "profit_factor": 1.71,
+      "return_pct": 15.92,
       "trades": 39,
       "win_rate_pct": 23.1
     }
