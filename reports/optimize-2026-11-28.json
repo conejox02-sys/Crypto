@@ -1,0 +1,380 @@
+{
+  "bars": 17279,
+  "current": {
+    "test": {
+      "avg_r": -0.373,
+      "fees": 7.96,
+      "max_drawdown_pct": 1.85,
+      "net_pnl": -11.07,
+      "profit_factor": 0.0,
+      "return_pct": -1.11,
+      "trades": 4,
+      "win_rate_pct": 0.0
+    },
+    "train": {
+      "avg_r": 0.426,
+      "fees": 80.83,
+      "max_drawdown_pct": 7.16,
+      "net_pnl": 150.33,
+      "profit_factor": 1.65,
+      "return_pct": 15.03,
+      "trades": 39,
+      "win_rate_pct": 23.1
+    }
+  },
+  "recommended": null,
+  "source": "file:data/sol-15m.json",
+  "split": 11519,
+  "top": [
+    {
+      "params": {
+        "atr_stop": 1.0,
+        "atr_target": 10.0,
+        "donchian_len": 30,
+        "min_atr_pct": 0.5,
+        "regime_ema": 1920,
+        "regime_slope_bars": 288,
+        "setups": {
+          "breakout": true,
+          "pullback": false
+        }
+      },
+      "score": 5.149746192893401,
+      "test": {
+        "avg_r": -1.445,
+        "fees": 3.97,
+        "max_drawdown_pct": 1.48,
+        "net_pnl": -14.84,
+        "profit_factor": 0.0,
+        "return_pct": -1.48,
+        "trades": 2,
+        "win_rate_pct": 0.0
+      },
+      "train": {
+        "avg_r": 1.313,
+        "fees": 60.58,
+        "max_drawdown_pct": 3.94,
+        "net_pnl": 202.92,
+        "profit_factor": 2.46,
+        "return_pct": 20.29,
+        "trades": 28,
+        "win_rate_pct": 21.4
+      }
+    },
+    {
+      "params": {
+        "atr_stop": 1.0,
+        "atr_target": 10.0,
+        "donchian_len": 20,
+        "min_atr_pct": 0.5,
+        "regime_ema": 1920,
+        "regime_slope_bars": 288,
+        "setups": {
+          "breakout": true,
+          "pullback": false
+        }
+      },
+      "score": 4.4822335025380715,
+      "test": {
+        "avg_r": -1.445,
+        "fees": 3.97,
+        "max_drawdown_pct": 1.48,
+        "net_pnl": -14.84,
+        "profit_factor": 0.0,
+        "return_pct": -1.48,
+        "trades": 2,
+        "win_rate_pct": 0.0
+      },
+      "train": {
+        "avg_r": 1.098,
+        "fees": 67.37,
+        "max_drawdown_pct": 3.94,
+        "net_pnl": 176.62,
+        "profit_factor": 2.09,
+        "return_pct": 17.66,
+        "trades": 31,
+        "win_rate_pct": 19.4
+      }
+    },
+    {
+      "params": {
+        "atr_stop": 1.0,
+        "atr_target": 10.0,
+        "donchian_len": 30,
+        "min_atr_pct": 0.5,
+        "regime_ema": 2880,
+        "regime_slope_bars": 288,
+        "setups": {
+          "breakout": true,
+          "pullback": false
+        }
+      },
+      "score": 3.6802030456852792,
+      "test": {
+        "avg_r": -1.445,
+        "fees": 3.97,
+        "max_drawdown_pct": 1.48,
+        "net_pnl": -14.84,
+        "profit_factor": 0.0,
+        "return_pct": -1.48,
+        "trades": 2,
+        "win_rate_pct": 0.0
+      },
+      "train": {
+        "avg_r": 1.119,
+        "fees": 50.87,
+        "max_drawdown_pct": 3.94,
+        "net_pnl": 144.96,
+        "profit_factor": 2.14,
+        "return_pct": 14.5,
+        "trades": 24,
+        "win_rate_pct": 20.8
+      }
+    },
+    {
+      "params": {
+        "atr_stop": 1.0,
+        "atr_target": 8.0,
+        "donchian_len": 30,
+        "min_atr_pct": 0.5,
+        "regime_ema": 1920,
+        "regime_slope_bars": 288,
+        "setups": {
+          "breakout": true,
+          "pullback": false
+        }
+      },
+      "score": 3.168646080760095,
+      "test": {
+        "avg_r": -1.445,
+        "fees": 3.97,
+        "max_drawdown_pct": 1.48,
+        "net_pnl": -14.84,
+        "profit_factor": 0.0,
+        "return_pct": -1.48,
+        "trades": 2,
+        "win_rate_pct": 0.0
+      },
+      "train": {
+        "avg_r": 0.888,
+        "fees": 61.02,
+        "max_drawdown_pct": 4.21,
+        "net_pnl": 133.36,
+        "profit_factor": 1.94,
+        "return_pct": 13.34,
+        "trades": 29,
+        "win_rate_pct": 20.7
+      }
+    },
+    {
+      "params": {
+        "atr_stop": 1.0,
+        "atr_target": 10.0,
+        "donchian_len": 20,
+        "min_atr_pct": 0.5,
+        "regime_ema": 2880,
+        "regime_slope_bars": 288,
+        "setups": {
+          "breakout": true,
+          "pullback": false
+        }
+      },
+      "score": 3.0431472081218276,
+      "test": {
+        "avg_r": -1.445,
+        "fees": 3.97,
+        "max_drawdown_pct": 1.48,
+        "net_pnl": -14.84,
+        "profit_factor": 0.0,
+        "return_pct": -1.48,
+        "trades": 2,
+        "win_rate_pct": 0.0
+      },
+      "train": {
+        "avg_r": 0.894,
+        "fees": 57.32,
+        "max_drawdown_pct": 3.94,
+        "net_pnl": 119.93,
+        "profit_factor": 1.8,
+        "return_pct": 11.99,
+        "trades": 27,
+        "win_rate_pct": 18.5
+      }
+    },
+    {
+      "params": {
+        "atr_stop": 1.5,
+        "atr_target": 10.0,
+        "donchian_len": 30,
+        "min_atr_pct": 0.5,
+        "regime_ema": 1920,
+        "regime_slope_bars": 288,
+        "setups": {
+          "breakout": true,
+          "pullback": false
+        }
+      },
+      "score": 2.8956228956228953,
+      "test": {
+        "avg_r": -1.296,
+        "fees": 3.96,
+        "max_drawdown_pct": 1.99,
+        "net_pnl": -19.94,
+        "profit_factor": 0.0,
+        "return_pct": -1.99,
+        "trades": 2,
+        "win_rate_pct": 0.0
+      },
+      "train": {
+        "avg_r": 0.783,
+        "fees": 53.8,
+        "max_drawdown_pct": 5.94,
+        "net_pnl": 171.98,
+        "profit_factor": 2.04,
+        "return_pct": 17.2,
+        "trades": 26,
+        "win_rate_pct": 23.1
+      }
+    },
+    {
+      "params": {
+        "atr_stop": 1.0,
+        "atr_target": 8.0,
+        "donchian_len": 20,
+        "min_atr_pct": 0.5,
+        "regime_ema": 1920,
+        "regime_slope_bars": 288,
+        "setups": {
+          "breakout": true,
+          "pullback": false
+        }
+      },
+      "score": 2.5890736342042757,
+      "test": {
+        "avg_r": -1.445,
+        "fees": 3.97,
+        "max_drawdown_pct": 1.48,
+        "net_pnl": -14.84,
+        "profit_factor": 0.0,
+        "return_pct": -1.48,
+        "trades": 2,
+        "win_rate_pct": 0.0
+      },
+      "train": {
+        "avg_r": 0.72,
+        "fees": 67.46,
+        "max_drawdown_pct": 4.21,
+        "net_pnl": 108.96,
+        "profit_factor": 1.66,
+        "return_pct": 10.9,
+        "trades": 32,
+        "win_rate_pct": 18.8
+      }
+    },
+    {
+      "params": {
+        "atr_stop": 1.0,
+        "atr_target": 5.0,
+        "donchian_len": 30,
+        "min_atr_pct": 0.5,
+        "regime_ema": 1920,
+        "regime_slope_bars": 288,
+        "setups": {
+          "breakout": true,
+          "pullback": false
+        }
+      },
+      "score": 2.5486284289276813,
+      "test": {
+        "avg_r": -1.445,
+        "fees": 3.97,
+        "max_drawdown_pct": 1.48,
+        "net_pnl": -14.84,
+        "profit_factor": 0.0,
+        "return_pct": -1.48,
+        "trades": 2,
+        "win_rate_pct": 0.0
+      },
+      "train": {
+        "avg_r": 0.564,
+        "fees": 71.37,
+        "max_drawdown_pct": 4.01,
+        "net_pnl": 102.2,
+        "profit_factor": 1.63,
+        "return_pct": 10.22,
+        "trades": 34,
+        "win_rate_pct": 26.5
+      }
+    },
+    {
+      "params": {
+        "atr_stop": 1.5,
+        "atr_target": 8.0,
+        "donchian_len": 30,
+        "min_atr_pct": 0.5,
+        "regime_ema": 1920,
+        "regime_slope_bars": 288,
+        "setups": {
+          "breakout": true,
+          "pullback": false
+        }
+      },
+      "score": 2.547138047138047,
+      "test": {
+        "avg_r": -1.296,
+        "fees": 3.96,
+        "max_drawdown_pct": 1.99,
+        "net_pnl": -19.94,
+        "profit_factor": 0.0,
+        "return_pct": -1.99,
+        "trades": 2,
+        "win_rate_pct": 0.0
+      },
+      "train": {
+        "avg_r": 0.661,
+        "fees": 54.95,
+        "max_drawdown_pct": 5.94,
+        "net_pnl": 151.29,
+        "profit_factor": 1.88,
+        "return_pct": 15.13,
+        "trades": 27,
+        "win_rate_pct": 25.9
+      }
+    },
+    {
+      "params": {
+        "atr_stop": 1.5,
+        "atr_target": 10.0,
+        "donchian_len": 30,
+        "min_atr_pct": 0.5,
+        "regime_ema": 2880,
+        "regime_slope_bars": 288,
+        "setups": {
+          "breakout": true,
+          "pullback": false
+        }
+      },
+      "score": 2.324915824915825,
+      "test": {
+        "avg_r": -1.296,
+        "fees": 3.96,
+        "max_drawdown_pct": 1.99,
+        "net_pnl": -19.94,
+        "profit_factor": 0.0,
+        "return_pct": -1.99,
+        "trades": 2,
+        "win_rate_pct": 0.0
+      },
+      "train": {
+        "avg_r": 0.741,
+        "fees": 45.22,
+        "max_drawdown_pct": 5.94,
+        "net_pnl": 138.11,
+        "profit_factor": 2.01,
+        "return_pct": 13.81,
+        "trades": 22,
+        "win_rate_pct": 22.7
+      }
+    }
+  ]
+}
